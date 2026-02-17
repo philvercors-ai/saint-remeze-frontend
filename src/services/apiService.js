@@ -219,7 +219,13 @@ const apiService = {
       console.error('❌ markAllRead error:', error);
       return { success: false };
     }
+  },
+
+async getRemarkById(id) {
+    return this.getRemark(id);
   }
+
+
 };
 
 export default apiService;
