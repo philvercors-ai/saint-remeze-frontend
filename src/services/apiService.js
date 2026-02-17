@@ -12,31 +12,34 @@ const apiService = {
 
   async register(userData) {
     try {
+      console.log('📝 Register - Envoi vers:', `${API_URL}/api/auth/register`);
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
       });
       const data = await response.json();
-      console.log('Register response:', data);
+      console.log('📝 Register - Réponse:', data);
       return data;
     } catch (error) {
-      console.error('Register error:', error);
+      console.error('❌ Register error:', error);
       return { success: false, message: 'Erreur de connexion au serveur' };
     }
   },
 
   async login(email, password) {
     try {
+      console.log('🔑 Login - Envoi vers:', `${API_URL}/api/auth/login`);
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await response.json();
+      console.log('🔑 Login - Réponse:', data);
       return data;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       return { success: false, message: 'Erreur de connexion au serveur' };
     }
   },
@@ -48,12 +51,30 @@ const apiService = {
   async getRemarks() {
     try {
       const token = localStorage.getItem('token');
+      console.log('📋 getRemarks - Token:', token ? `${token.substring(0, 20)}...` : '❌ ABSENT');
+      
+      if (!token) {
+        console.error('❌ getRemarks - Pas de token !');
+        return { success: false, data: [] };
+      }
+
       const response = await fetch(`${API_URL}/api/remarks`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      console.log('📋 getRemarks - Status:', response.status);
+
+      if (response.status === 401) {
+        console.error('❌ Token invalide ou expiré');
+        return { success: false, data: [] };
+      }
+
       return await response.json();
     } catch (error) {
-      console.error('getRemarks error:', error);
+      console.error('❌ getRemarks error:', error);
       return { success: false, data: [] };
     }
   },
@@ -61,6 +82,14 @@ const apiService = {
   async createRemark(remarkData) {
     try {
       const token = localStorage.getItem('token');
+      console.log('➕ createRemark - Token:', token ? `${token.substring(0, 20)}...` : '❌ ABSENT');
+      console.log('➕ createRemark - Data:', remarkData);
+
+      if (!token) {
+        console.error('❌ createRemark - Pas de token !');
+        return { success: false, message: 'Non authentifié' };
+      }
+
       const response = await fetch(`${API_URL}/api/remarks`, {
         method: 'POST',
         headers: {
@@ -69,9 +98,19 @@ const apiService = {
         },
         body: JSON.stringify(remarkData)
       });
-      return await response.json();
+
+      console.log('➕ createRemark - Status:', response.status);
+
+      if (response.status === 401) {
+        console.error('❌ Token invalide ou expiré');
+        return { success: false, message: 'Session expirée, reconnectez-vous' };
+      }
+
+      const data = await response.json();
+      console.log('➕ createRemark - Réponse:', data);
+      return data;
     } catch (error) {
-      console.error('createRemark error:', error);
+      console.error('❌ createRemark error:', error);
       return { success: false, message: 'Erreur de connexion au serveur' };
     }
   },
@@ -79,12 +118,24 @@ const apiService = {
   async getRemark(id) {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        return { success: false, message: 'Non authentifié' };
+      }
+
       const response = await fetch(`${API_URL}/api/remarks/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (response.status === 401) {
+        return { success: false, message: 'Session expirée' };
+      }
+
       return await response.json();
     } catch (error) {
-      console.error('getRemark error:', error);
+      console.error('❌ getRemark error:', error);
       return { success: false, message: 'Erreur de connexion au serveur' };
     }
   },
@@ -96,12 +147,28 @@ const apiService = {
   async getNotifications() {
     try {
       const token = localStorage.getItem('token');
+      console.log('🔔 getNotifications - Token:', token ? 'Présent' : '❌ ABSENT');
+
+      if (!token) {
+        return { success: false, data: [] };
+      }
+
       const response = await fetch(`${API_URL}/api/notifications`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      console.log('🔔 getNotifications - Status:', response.status);
+
+      if (response.status === 401) {
+        return { success: false, data: [] };
+      }
+
       return await response.json();
     } catch (error) {
-      console.error('getNotifications error:', error);
+      console.error('❌ getNotifications error:', error);
       return { success: false, data: [] };
     }
   },
@@ -109,13 +176,23 @@ const apiService = {
   async markNotificationRead(id) {
     try {
       const token = localStorage.getItem('token');
+      if (!token) return { success: false };
+
       const response = await fetch(`${API_URL}/api/notifications/${id}/read`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (response.status === 401) {
+        return { success: false };
+      }
+
       return await response.json();
     } catch (error) {
-      console.error('markNotificationRead error:', error);
+      console.error('❌ markNotificationRead error:', error);
       return { success: false };
     }
   },
@@ -123,13 +200,23 @@ const apiService = {
   async markAllNotificationsRead() {
     try {
       const token = localStorage.getItem('token');
+      if (!token) return { success: false };
+
       const response = await fetch(`${API_URL}/api/notifications/read-all`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+
+      if (response.status === 401) {
+        return { success: false };
+      }
+
       return await response.json();
     } catch (error) {
-      console.error('markAllRead error:', error);
+      console.error('❌ markAllRead error:', error);
       return { success: false };
     }
   }

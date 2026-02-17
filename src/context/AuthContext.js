@@ -1,39 +1,77 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import apiService from '../services/apiService';
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      const userData = JSON.parse(localStorage.getItem('user'));
-      setUser(userData);
+    // Charger l'utilisateur depuis localStorage au démarrage
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    console.log('🔐 AuthContext init - Token:', token ? 'Présent' : 'Absent');
+    console.log('👤 AuthContext init - User:', storedUser ? 'Présent' : 'Absent');
+    
+    if (token && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        console.log('✅ Utilisateur restauré:', parsedUser.email);
+      } catch (error) {
+        console.error('❌ Erreur parsing user:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
+    
     setLoading(false);
-  }, [token]);
+  }, []);
 
-  const login = (userData, userToken) => {
-    setUser(userData);
-    setToken(userToken);
-    localStorage.setItem('token', userToken);
+  const login = (token, userData) => {
+    console.log('🔑 Login - Stockage token et user');
+    console.log('Token:', token ? 'Présent' : 'Absent');
+    console.log('User:', userData);
+    
+    localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    
+    // Vérification immédiate
+    const savedToken = localStorage.getItem('token');
+    console.log('✅ Token sauvegardé:', savedToken ? 'OK' : '❌ ÉCHEC');
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
+    console.log('👋 Logout');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setUser(null);
   };
 
+  const value = {
+    user,
+    loading,
+    login,
+    logout,
+    isAuthenticated: !!user
+  };
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
