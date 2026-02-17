@@ -2,33 +2,54 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiService from '../services/apiService';
-import './AuthPages.css';
+import './LoginPage.css';
 
 function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault(); // ✅ CRITIQUE - Empêcher rechargement
+    
+    console.log('🔑 Tentative connexion...', { email: formData.email, password: '***' });
+
+    if (!formData.email || !formData.password) {
+      setError('Email et mot de passe obligatoires');
+      return;
+    }
+
     setLoading(true);
+    setError('');
 
     try {
-      const result = await apiService.login(formData);
+      console.log('🚀 Envoi vers API login...');
+      const result = await apiService.login(formData.email, formData.password);
+      console.log('📨 Réponse login:', result);
+
       if (result.success) {
-        login(result.data.user, result.data.token);
+        console.log('✅ Connexion réussie');
+        login(result.data.token, result.data.user);
         navigate('/');
       } else {
-        setError(result.message || 'Erreur de connexion');
+        console.error('❌ Connexion échouée:', result.message);
+        setError(result.message || 'Email ou mot de passe incorrect');
       }
     } catch (err) {
+      console.error('❌ Erreur connexion:', err);
       setError('Erreur de connexion au serveur');
     } finally {
       setLoading(false);
@@ -36,48 +57,61 @@ function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="logo-container">
-          <img src="/logo-saint-remeze.png" alt="Saint-Remèze" onError={(e) => e.target.style.display='none'} />
+    <div className="login-page">
+      <div className="login-container">
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <img 
+            src="/logo-saint-remeze.png" 
+            alt="Saint-Remèze" 
+            style={{ height: '60px' }} 
+            onError={(e) => e.target.style.display='none'} 
+          />
         </div>
-        <h1>🏛️ Saint-Remèze</h1>
-        <p className="subtitle">Connexion</p>
+        <h1>Connexion</h1>
+        <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '30px' }}>
+          Accédez à votre espace citoyen
+        </p>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
+              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              disabled={loading}
+              autoComplete="email"
             />
           </div>
 
           <div className="form-group">
-            <label>Mot de passe</label>
+            <label htmlFor="password">Mot de passe</label>
             <input
               type="password"
+              id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              disabled={loading}
+              autoComplete="current-password"
             />
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={loading}
+          >
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        <p className="link-text">
-          Pas encore de compte ? <Link to="/register">S'inscrire</Link>
+        <p style={{ textAlign: 'center', marginTop: '20px', color: '#64748b' }}>
+          Pas encore de compte ? <Link to="/register" style={{ color: '#2563eb', fontWeight: '600' }}>S'inscrire</Link>
         </p>
       </div>
     </div>
