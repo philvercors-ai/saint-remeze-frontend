@@ -1,76 +1,137 @@
+// src/services/apiService.js
+
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:10000';
 
-const getToken = () => localStorage.getItem('token');
+console.log('🌐 API URL:', API_URL);
 
 const apiService = {
-  // Auth
-  async register(data) {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
+
+  // ============================
+  // AUTH
+  // ============================
+
+  async register(userData) {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      const data = await response.json();
+      console.log('Register response:', data);
+      return data;
+    } catch (error) {
+      console.error('Register error:', error);
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
   },
 
-  async login(data) {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    return response.json();
+  async login(email, password) {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
   },
 
-  // Remarks
-  async createRemark(data) {
-    const response = await fetch(`${API_URL}/api/remarks`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
-      body: JSON.stringify(data)
-    });
-    return response.json();
-  },
+  // ============================
+  // REMARKS
+  // ============================
 
   async getRemarks() {
-    const response = await fetch(`${API_URL}/api/remarks`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
-    return response.json();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/remarks`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('getRemarks error:', error);
+      return { success: false, data: [] };
+    }
   },
 
-  async getRemarkById(id) {
-    const response = await fetch(`${API_URL}/api/remarks/${id}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
-    return response.json();
+  async createRemark(remarkData) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/remarks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(remarkData)
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('createRemark error:', error);
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
   },
 
-  // Notifications
+  async getRemark(id) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/remarks/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('getRemark error:', error);
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
+  },
+
+  // ============================
+  // NOTIFICATIONS
+  // ============================
+
   async getNotifications() {
-    const response = await fetch(`${API_URL}/api/notifications`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
-    return response.json();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/notifications`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('getNotifications error:', error);
+      return { success: false, data: [] };
+    }
   },
 
-  async markAsRead(id) {
-    const response = await fetch(`${API_URL}/api/notifications/${id}/read`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
-    return response.json();
+  async markNotificationRead(id) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('markNotificationRead error:', error);
+      return { success: false };
+    }
   },
 
-  async markAllAsRead() {
-    const response = await fetch(`${API_URL}/api/notifications/read-all`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${getToken()}` }
-    });
-    return response.json();
+  async markAllNotificationsRead() {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('markAllRead error:', error);
+      return { success: false };
+    }
   }
 };
 
