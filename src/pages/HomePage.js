@@ -17,7 +17,19 @@ function HomePage() {
 
   const loadData = async () => {
     try {
-      const data = await apiService.getRemarks();
+      const response = await apiService.getRemarks();
+      console.log('📦 Réponse API:', response);
+      
+      // L'API renvoie soit un tableau, soit { success: true, data: [...] }
+      const data = Array.isArray(response) ? response : (response.data || []);
+      
+      if (!Array.isArray(data)) {
+        console.error('❌ Données non valides:', data);
+        setRemarks([]);
+        setLoading(false);
+        return;
+      }
+      
       setRemarks(data);
       
       const statsData = {
@@ -28,7 +40,8 @@ function HomePage() {
       };
       setStats(statsData);
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('❌ Erreur chargement:', error);
+      setRemarks([]);
     } finally {
       setLoading(false);
     }
