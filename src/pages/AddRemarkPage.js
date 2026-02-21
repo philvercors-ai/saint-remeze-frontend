@@ -36,27 +36,92 @@ function AddRemarkPage() {
   const [gettingLocation, setGettingLocation] = useState(false);
 
   // ===== GESTION PHOTO =====
-  const handlePhotoCapture = (e) => {
+  const handlePhotoCapture = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Vérifier la taille (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Photo trop volumineuse (max 5MB)');
+    // Vérifier la taille (max 10MB avant compression)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Photo trop volumineuse (max 10MB)');
       return;
     }
 
-    // Créer preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData({
-        ...formData,
-        photo: file,
-        photoPreview: reader.result
-      });
-      setError('');
-    };
-    reader.readAsDataURL(file);
+    try {
+      // ✅ COMPRESSION AUTOMATIQUE
+      const compressedFile = await compressImage(file);
+      
+      // Créer preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          photo: compressedFile,
+          photoPreview: reader.result
+        });
+        setError('');
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (err) {
+      console.error('Erreur compression:', err);
+      setError('Erreur lors du traitement de la photo');
+    }
+  };
+
+  // ===== COMPRESSION IMAGE =====
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          // Redimensionner si trop grand (max 1200px)
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 1200;
+          
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = (maxSize / width) * height;
+              width = maxSize;
+            } else {
+              width = (maxSize / height) * width;
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Dessiner l'image redimensionnée
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convertir en blob avec qualité 0.7 (30% de compression)
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                console.log(`✅ Image compressée: ${(file.size / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB`);
+                resolve(compressedFile);
+              } else {
+                reject(new Error('Compression échouée'));
+              }
+            },
+            'image/jpeg',
+            0.7 // Qualité 70%
+          );
+        };
+        img.onerror = () => reject(new Error('Chargement image échoué'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('Lecture fichier échouée'));
+      reader.readAsDataURL(file);
+    });
   };
 
   const removePhoto = () => {
