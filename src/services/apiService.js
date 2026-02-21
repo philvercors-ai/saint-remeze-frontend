@@ -79,41 +79,32 @@ const apiService = {
     }
   },
 
-  async createRemark(remarkData) {
-    try {
-      const token = localStorage.getItem('token');
-      console.log('➕ createRemark - Token:', token ? `${token.substring(0, 20)}...` : '❌ ABSENT');
-      console.log('➕ createRemark - Data:', remarkData);
+ // Dans apiService.js, modifiez createRemark :
 
-      if (!token) {
-        console.error('❌ createRemark - Pas de token !');
-        return { success: false, message: 'Non authentifié' };
-      }
-
-      const response = await fetch(`${API_URL}/api/remarks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(remarkData)
-      });
-
-      console.log('➕ createRemark - Status:', response.status);
-
-      if (response.status === 401) {
-        console.error('❌ Token invalide ou expiré');
-        return { success: false, message: 'Session expirée, reconnectez-vous' };
-      }
-
-      const data = await response.json();
-      console.log('➕ createRemark - Réponse:', data);
-      return data;
-    } catch (error) {
-      console.error('❌ createRemark error:', error);
-      return { success: false, message: 'Erreur de connexion au serveur' };
+async createRemark(remarkData) {
+  try {
+    const token = localStorage.getItem('token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+    
+    // Si ce n'est PAS un FormData, on ajoute le Content-Type JSON
+    const isFormData = remarkData instanceof FormData;
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
     }
-  },
+
+    const response = await fetch(`${API_URL}/api/remarks`, {
+      method: 'POST',
+      headers: headers,
+      // On ne stringify que si ce n'est pas un FormData
+      body: isFormData ? remarkData : JSON.stringify(remarkData)
+    });
+
+    if (response.status === 401) return { success: false, message: 'Session expirée' };
+    return await response.json();
+  } catch (error) {
+    return { success: false, message: 'Erreur de connexion' };
+  }
+},
 
   async getRemark(id) {
     try {

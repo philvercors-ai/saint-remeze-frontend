@@ -35,97 +35,59 @@ function AddRemarkPage() {
   const [error, setError] = useState('');
   const [gettingLocation, setGettingLocation] = useState(false);
 
-  const compressImage = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          let width = img.width;
-          let height = img.height;
-          const maxSize = 1200;
-          
-          if (width > maxSize || height > maxSize) {
-            if (width > height) {
-              height = (maxSize / width) * height;
-              width = maxSize;
-            } else {
-              width = (maxSize / height) * width;
-              height = maxSize;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          canvas.toBlob(
-            (blob) => {
-              if (blob) {
-                const compressedFile = new File([blob], file.name, {
-                  type: 'image/jpeg',
-                  lastModified: Date.now()
-                });
-                const originalSize = (file.size / 1024).toFixed(0);
-                const compressedSize = (blob.size / 1024).toFixed(0);
-                console.log('Image compressée: ' + originalSize + 'KB -> ' + compressedSize + 'KB');
-                resolve(compressedFile);
-              } else {
-                reject(new Error('Compression échouée'));
-              }
-            },
-            'image/jpeg',
-            0.7
-          );
-        };
-        img.onerror = () => reject(new Error('Chargement image échoué'));
-        img.src = e.target.result;
-      };
-      reader.onerror = () => reject(new Error('Lecture fichier échouée'));
-      reader.readAsDataURL(file);
-    });
-  };
+ // Dans AddRemarkPage.js, remplacez ces fonctions :
 
-  const handlePhotoCapture = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const compressImage = (file) => {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl); // Libère la mémoire
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      let width = img.width;
+      let height = img.height;
+      const maxSize = 1200;
+      if (width > maxSize || height > maxSize) {
+        if (width > height) { height = (maxSize / width) * height; width = maxSize; }
+        else { width = (maxSize / height) * width; height = maxSize; }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+        } else { reject(new Error('Compression échouée')); }
+      }, 'image/jpeg', 0.7);
+    };
+    img.src = objectUrl;
+  });
+};
 
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Photo trop volumineuse (max 10MB)');
-      return;
-    }
-
-    try {
-      const compressedFile = await compressImage(file);
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          photo: compressedFile,
-          photoPreview: reader.result
-        });
-        setError('');
-      };
-      reader.readAsDataURL(compressedFile);
-    } catch (err) {
-      console.error('Erreur compression:', err);
-      setError('Erreur traitement photo');
-    }
-  };
-
-  const removePhoto = () => {
+const handlePhotoCapture = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setLoading(true);
+  try {
+    const compressedFile = await compressImage(file);
+    // Supprime l'ancienne preview pour libérer la mémoire
+    if (formData.photoPreview) URL.revokeObjectURL(formData.photoPreview);
+    
     setFormData({
       ...formData,
-      photo: null,
-      photoPreview: null
+      photo: compressedFile,
+      photoPreview: URL.createObjectURL(compressedFile) // Preview optimisée
     });
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    if (cameraInputRef.current) cameraInputRef.current.value = '';
-  };
+    setError('');
+  } catch (err) { setError('Erreur traitement photo'); }
+  finally { setLoading(false); }
+};
+
+const removePhoto = () => {
+  if (formData.photoPreview) URL.revokeObjectURL(formData.photoPreview);
+  setFormData({ ...formData, photo: null, photoPreview: null });
+};
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {

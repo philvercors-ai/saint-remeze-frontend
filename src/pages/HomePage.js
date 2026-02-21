@@ -15,37 +15,26 @@ function HomePage() {
     loadData();
   }, []);
 
-  const loadData = async () => {
-    try {
-      const response = await apiService.getRemarks();
-      console.log('📦 Réponse API:', response);
-      
-      // L'API renvoie soit un tableau, soit { success: true, data: [...] }
-      const data = Array.isArray(response) ? response : (response.data || []);
-      
-      if (!Array.isArray(data)) {
-        console.error('❌ Données non valides:', data);
-        setRemarks([]);
-        setLoading(false);
-        return;
-      }
-      
-      setRemarks(data);
-      
-      const statsData = {
-        total: data.length,
-        pending: data.filter(r => r.status === 'En attente').length,
-        progress: data.filter(r => r.status === 'En cours').length,
-        done: data.filter(r => r.status === 'Terminée').length
-      };
-      setStats(statsData);
-    } catch (error) {
-      console.error('❌ Erreur chargement:', error);
-      setRemarks([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Dans HomePage.js, sécurisez loadData :
+
+const loadData = async () => {
+  try {
+    const response = await apiService.getRemarks();
+    // Sécurité : on s'assure d'avoir un tableau
+    const data = Array.isArray(response) ? response : (response?.data || []);
+    setRemarks(data);
+    
+    setStats({
+      total: data.length,
+      pending: data.filter(r => r?.status === 'En attente').length,
+      progress: data.filter(r => r?.status === 'En cours').length,
+      done: data.filter(r => r?.status === 'Terminée').length
+    });
+  } catch (error) {
+    console.error('Erreur:', error);
+    setRemarks([]);
+  } finally { setLoading(false); }
+};
 
   const getStatusClass = (status) => {
     const map = {
