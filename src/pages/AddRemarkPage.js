@@ -35,7 +35,6 @@ function AddRemarkPage() {
   const [error, setError] = useState('');
   const [gettingLocation, setGettingLocation] = useState(false);
 
-  // ===== COMPRESSION IMAGE =====
   const compressImage = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -70,7 +69,9 @@ function AddRemarkPage() {
                   type: 'image/jpeg',
                   lastModified: Date.now()
                 });
-                console.log(\`✅ Image compressée: \${(file.size / 1024).toFixed(0)}KB → \${(blob.size / 1024).toFixed(0)}KB\`);
+                const originalSize = (file.size / 1024).toFixed(0);
+                const compressedSize = (blob.size / 1024).toFixed(0);
+                console.log('Image compressée: ' + originalSize + 'KB -> ' + compressedSize + 'KB');
                 resolve(compressedFile);
               } else {
                 reject(new Error('Compression échouée'));
@@ -88,7 +89,6 @@ function AddRemarkPage() {
     });
   };
 
-  // ===== GESTION PHOTO =====
   const handlePhotoCapture = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -113,7 +113,7 @@ function AddRemarkPage() {
       reader.readAsDataURL(compressedFile);
     } catch (err) {
       console.error('Erreur compression:', err);
-      setError('Erreur lors du traitement de la photo');
+      setError('Erreur traitement photo');
     }
   };
 
@@ -127,7 +127,6 @@ function AddRemarkPage() {
     if (cameraInputRef.current) cameraInputRef.current.value = '';
   };
 
-  // ===== GÉOLOCALISATION =====
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setError('Géolocalisation non disponible');
@@ -150,7 +149,7 @@ function AddRemarkPage() {
       },
       (err) => {
         console.error('Erreur géolocalisation:', err);
-        setError('Impossible d\'obtenir votre position');
+        setError('Impossible obtenir position');
         setGettingLocation(false);
       },
       {
@@ -161,12 +160,11 @@ function AddRemarkPage() {
     );
   };
 
-  // ===== SOUMISSION =====
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.category || !formData.title) {
-      setError('Catégorie et titre sont obligatoires');
+      setError('Catégorie et titre obligatoires');
       return;
     }
 
@@ -193,11 +191,11 @@ function AddRemarkPage() {
       if (result.success) {
         navigate('/');
       } else {
-        setError(result.message || 'Erreur lors de l\'envoi');
+        setError(result.message || 'Erreur envoi');
       }
     } catch (err) {
       console.error('Erreur soumission:', err);
-      setError('Erreur de connexion au serveur');
+      setError('Erreur connexion serveur');
     } finally {
       setLoading(false);
     }
