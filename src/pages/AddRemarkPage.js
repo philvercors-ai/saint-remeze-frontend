@@ -35,59 +35,101 @@ function AddRemarkPage() {
   const [error, setError] = useState('');
   const [gettingLocation, setGettingLocation] = useState(false);
 
- // Dans AddRemarkPage.js, remplacez ces fonctions :
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 1200;
+          
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = (maxSize / width) * height;
+              width = maxSize;
+            } else {
+              width = (maxSize / height) * width;
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                const originalSize = (file.size / 1024).toFixed(0);
+                const compressedSize = (blob.size / 1024).toFixed(0);
+                console.log('COMPRESSION OK: ' + originalSize + 'KB -> ' + compressedSize + 'KB');
+                resolve(compressedFile);
+              } else {
+                reject(new Error('Compression failed'));
+              }
+            },
+            'image/jpeg',
+            0.7
+          );
+        };
+        img.onerror = () => reject(new Error('Image load failed'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('File read failed'));
+      reader.readAsDataURL(file);
+    });
+  };
 
-const compressImage = (file) => {
-  return new Promise((resolve, reject) => {
-    const objectUrl = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl); // Libère la mémoire
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      let width = img.width;
-      let height = img.height;
-      const maxSize = 1200;
-      if (width > maxSize || height > maxSize) {
-        if (width > height) { height = (maxSize / width) * height; width = maxSize; }
-        else { width = (maxSize / height) * width; height = maxSize; }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-        } else { reject(new Error('Compression échouée')); }
-      }, 'image/jpeg', 0.7);
-    };
-    img.src = objectUrl;
-  });
-};
+  const handlePhotoCapture = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-const handlePhotoCapture = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  setLoading(true);
-  try {
-    const compressedFile = await compressImage(file);
-    // Supprime l'ancienne preview pour libérer la mémoire
-    if (formData.photoPreview) URL.revokeObjectURL(formData.photoPreview);
-    
+    console.log('Photo selected:', file.size, 'bytes');
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Photo trop volumineuse (max 10MB)');
+      return;
+    }
+
+    try {
+      console.log('Starting compression...');
+      const compressedFile = await compressImage(file);
+      console.log('Compression done!');
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          photo: compressedFile,
+          photoPreview: reader.result
+        });
+        setError('');
+      };
+      reader.readAsDataURL(compressedFile);
+    } catch (err) {
+      console.error('Compression error:', err);
+      setError('Erreur traitement photo');
+    }
+  };
+
+  const removePhoto = () => {
     setFormData({
       ...formData,
-      photo: compressedFile,
-      photoPreview: URL.createObjectURL(compressedFile) // Preview optimisée
+      photo: null,
+      photoPreview: null
     });
-    setError('');
-  } catch (err) { setError('Erreur traitement photo'); }
-  finally { setLoading(false); }
-};
-
-const removePhoto = () => {
-  if (formData.photoPreview) URL.revokeObjectURL(formData.photoPreview);
-  setFormData({ ...formData, photo: null, photoPreview: null });
-};
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -110,7 +152,7 @@ const removePhoto = () => {
         setGettingLocation(false);
       },
       (err) => {
-        console.error('Erreur géolocalisation:', err);
+        console.error('Geo error:', err);
         setError('Impossible obtenir position');
         setGettingLocation(false);
       },
@@ -134,12 +176,14 @@ const removePhoto = () => {
     setError('');
 
     try {
+      console.log('Submitting remark...');
       const submitData = new FormData();
       submitData.append('category', formData.category);
       submitData.append('title', formData.title);
       submitData.append('description', formData.description);
       
       if (formData.photo) {
+        console.log('Adding photo:', formData.photo.size, 'bytes');
         submitData.append('photo', formData.photo);
       }
       
@@ -149,6 +193,7 @@ const removePhoto = () => {
       }
 
       const result = await apiService.createRemark(submitData);
+      console.log('Result:', result);
 
       if (result.success) {
         navigate('/');
@@ -156,8 +201,8 @@ const removePhoto = () => {
         setError(result.message || 'Erreur envoi');
       }
     } catch (err) {
-      console.error('Erreur soumission:', err);
-      setError('Erreur connexion serveur');
+      console.error('Submit error:', err);
+      setError('Erreur: ' + err.message);
     } finally {
       setLoading(false);
     }
