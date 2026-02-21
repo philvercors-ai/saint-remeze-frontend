@@ -1,6 +1,6 @@
 {
   "name": "saint-remeze-app",
-  "version": "7.2.3",
+  "version": "7.2.4",
   "description": "Application citoyenne Saint-Remèze",
   "private": true,
   "scripts": {
