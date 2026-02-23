@@ -12,7 +12,6 @@ function RemarkDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('📋 [CORRECT] Chargement remarque:', id);
     fetchRemarkDetail();
   }, [id]);
 
@@ -22,77 +21,46 @@ function RemarkDetailPage() {
       const response = await fetch(`${API_URL}/api/remarks/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-
       if (!response.ok) throw new Error('Erreur chargement');
-
       const data = await response.json();
       const remarkData = data.data || data;
-      console.log('✅ [CORRECT] Remarque chargée:', remarkData);
       setRemark(remarkData);
       setLoading(false);
     } catch (err) {
-      console.error('❌ [CORRECT] Erreur:', err);
       setError(err.message);
       setLoading(false);
     }
   };
 
-  // FONCTION CORRECTION URL CLOUDINARY
   const getImageUrl = (remarkData) => {
-    console.log('🔍 [CORRECT] getImageUrl appelé avec:', remarkData);
-    
-    if (!remarkData) {
-      console.log('❌ [CORRECT] Pas de données');
-      return null;
-    }
-
-    // Fonction de correction URL
+    if (!remarkData) return null;
     const fixUrl = (url) => {
       if (!url) return null;
-      
-      console.log('🔧 [CORRECT] URL originale:', url);
-      
-      // CORRECTION 1 : https// → https://
       let fixed = url.replace(/https\/\//g, 'https://');
-      
-      // CORRECTION 2 : http// → http://
       fixed = fixed.replace(/http\/\//g, 'http://');
-      
-      if (fixed !== url) {
-        console.log('✅ [CORRECT] URL CORRIGÉE:', url, '→', fixed);
-      } else {
-        console.log('✅ [CORRECT] URL OK (pas besoin de correction)');
-      }
-      
       return fixed;
     };
-
-    // Vérifier photoUrl
-    if (remarkData.photoUrl) {
-      console.log('📸 [CORRECT] photoUrl trouvé:', remarkData.photoUrl);
-      const fixed = fixUrl(remarkData.photoUrl);
-      console.log('🖼️ [CORRECT] URL finale:', fixed);
-      return fixed;
-    }
-
-    // Vérifier image
-    if (remarkData.image) {
-      console.log('📸 [CORRECT] image trouvé:', remarkData.image);
-      const fixed = fixUrl(remarkData.image);
-      console.log('🖼️ [CORRECT] URL finale:', fixed);
-      return fixed;
-    }
-
-    console.log('❌ [CORRECT] Aucune photo trouvée');
+    if (remarkData.photoUrl) return fixUrl(remarkData.photoUrl);
+    if (remarkData.image) return fixUrl(remarkData.image);
     return null;
+  };
+
+  const getStatusConfig = (status) => {
+    const configs = {
+      'Terminée':  { color: '#059669', bg: '#d1fae5', label: 'Terminée' },
+      'En cours':  { color: '#2563eb', bg: '#dbeafe', label: 'En cours' },
+      'Rejetée':   { color: '#dc2626', bg: '#fee2e2', label: 'Rejetée' },
+      'En attente':{ color: '#d97706', bg: '#fef3c7', label: 'En attente' },
+    };
+    return configs[status] || configs['En attente'];
   };
 
   if (loading) {
     return (
-      <div className="detail-page">
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Chargement...</p>
+      <div className="rdp-page">
+        <div className="rdp-loading">
+          <div className="rdp-spinner"></div>
+          <p>Chargement…</p>
         </div>
       </div>
     );
@@ -100,12 +68,13 @@ function RemarkDetailPage() {
 
   if (error || !remark) {
     return (
-      <div className="detail-page">
-        <div className="error-container">
-          <h2>❌ Erreur</h2>
-          <p>{error || 'Remarque introuvable'}</p>
-          <button className="btn-primary" onClick={() => navigate('/')}>
-            Retour
+      <div className="rdp-page">
+        <div className="rdp-error-box">
+          <div className="rdp-error-icon">!</div>
+          <h2>Remarque introuvable</h2>
+          <p>{error || "Cette remarque n'existe pas ou a été supprimée."}</p>
+          <button className="rdp-btn-back" onClick={() => navigate('/')}>
+            ← Retour à la liste
           </button>
         </div>
       </div>
@@ -113,109 +82,116 @@ function RemarkDetailPage() {
   }
 
   const imageUrl = getImageUrl(remark);
+  const statusConfig = getStatusConfig(remark.status);
 
   return (
-    <div className="detail-page">
-      <div className="detail-header">
-        <button className="btn-back" onClick={() => navigate('/')}>
-          ← Retour
+    <div className="rdp-page">
+      <header className="rdp-header">
+        <button className="rdp-back-btn" onClick={() => navigate('/')}>
+          <span>←</span>
+          <span>Retour</span>
         </button>
-        <h1>Détails de la remarque</h1>
-      </div>
+        <span className="rdp-header-label">Remarque citoyenne</span>
+        <div></div>
+      </header>
 
-      <div className="detail-content">
-        <div className="detail-card">
-          <div className="detail-status">
-            <span 
-              className="status-badge" 
-              style={{ 
-                backgroundColor: remark.status === 'Terminée' ? '#10b981' : 
-                                remark.status === 'En cours' ? '#3b82f6' : 
-                                remark.status === 'Rejetée' ? '#ef4444' : '#f59e0b'
-              }}
-            >
-              {remark.status === 'Terminée' ? '✅' : 
-               remark.status === 'En cours' ? '🔄' : 
-               remark.status === 'Rejetée' ? '❌' : '⏳'} {remark.status}
+      <main className="rdp-main">
+        {imageUrl ? (
+          <div className="rdp-image-wrapper">
+            <img
+              src={imageUrl}
+              alt={remark.title}
+              className="rdp-hero-image"
+              onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+            />
+          </div>
+        ) : (
+          <div className="rdp-no-image">
+            <span>📷</span>
+            <p>Aucune photo jointe</p>
+          </div>
+        )}
+
+        <div className="rdp-card">
+          <div className="rdp-meta">
+            <span className="rdp-status" style={{ color: statusConfig.color, background: statusConfig.bg }}>
+              <span className="rdp-status-dot" style={{ background: statusConfig.color }}></span>
+              {statusConfig.label}
             </span>
-            <span className="detail-date">
-              {new Date(remark.createdAt).toLocaleDateString('fr-FR')}
+            <span className="rdp-date">
+              {new Date(remark.createdAt).toLocaleDateString('fr-FR', {
+                day: 'numeric', month: 'long', year: 'numeric'
+              })}
             </span>
           </div>
 
-          <div className="detail-section">
-            <h2>{remark.title}</h2>
-            <p className="detail-category">📁 {remark.category}</p>
+          <h1 className="rdp-title">{remark.title}</h1>
+
+          <div className="rdp-category">
+            <span>📁</span>
+            {remark.category}
           </div>
 
-          {imageUrl && (
-            <div className="detail-section">
-              <h3>📸 Photo</h3>
-              <div className="image-container">
-                <img 
-                  src={imageUrl} 
-                  alt={remark.title}
-                  onError={(e) => {
-                    console.error('❌ [CORRECT] Erreur chargement:', imageUrl);
-                    e.target.style.display = 'none';
-                    const errorDiv = document.createElement('div');
-                    errorDiv.style.padding = '1rem';
-                    errorDiv.style.background = '#fef3c7';
-                    errorDiv.style.borderRadius = '8px';
-                    errorDiv.style.color = '#92400e';
-                    errorDiv.innerHTML = `<p>⚠️ Photo non disponible</p><small style="font-size:0.875rem;display:block;margin-top:0.5rem">URL: ${imageUrl}</small>`;
-                    e.target.parentElement.appendChild(errorDiv);
-                  }}
-                  onLoad={() => {
-                    console.log('✅ [CORRECT] Image chargée:', imageUrl);
-                  }}
-                  crossOrigin="anonymous"
-                  style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
-                />
-              </div>
-            </div>
-          )}
+          <div className="rdp-divider"></div>
 
-          <div className="detail-section">
-            <h3>📝 Description</h3>
-            <p className="detail-description">{remark.description}</p>
-          </div>
+          <section className="rdp-section">
+            <h3 className="rdp-section-title">Description</h3>
+            <p className="rdp-description">{remark.description}</p>
+          </section>
 
           {remark.location?.coordinates && (
-            <div className="detail-section">
-              <h3>📍 Localisation</h3>
-              <div className="location-info">
-                <p>
-                  Latitude: {remark.location.coordinates[1].toFixed(6)}<br/>
-                  Longitude: {remark.location.coordinates[0].toFixed(6)}
-                </p>
-                <a 
+            <>
+              <div className="rdp-divider"></div>
+              <section className="rdp-section">
+                <h3 className="rdp-section-title">Localisation</h3>
+                <div className="rdp-coords">
+                  <div className="rdp-coord-item">
+                    <span className="rdp-coord-label">Latitude</span>
+                    <span className="rdp-coord-value">{remark.location.coordinates[1].toFixed(6)}</span>
+                  </div>
+                  <div className="rdp-coord-item">
+                    <span className="rdp-coord-label">Longitude</span>
+                    <span className="rdp-coord-value">{remark.location.coordinates[0].toFixed(6)}</span>
+                  </div>
+                </div>
+                <a
                   href={`https://www.google.com/maps?q=${remark.location.coordinates[1]},${remark.location.coordinates[0]}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-map"
+                  className="rdp-map-btn"
                 >
                   🗺️ Voir sur Google Maps
                 </a>
-              </div>
-            </div>
+              </section>
+            </>
           )}
 
           {remark.assignedTo && (
-            <div className="detail-section">
-              <h3>👤 Assigné à</h3>
-              <p>{remark.assignedTo}</p>
-            </div>
+            <>
+              <div className="rdp-divider"></div>
+              <section className="rdp-section">
+                <h3 className="rdp-section-title">Assigné à</h3>
+                <div className="rdp-assigned">
+                  <div className="rdp-avatar">{remark.assignedTo[0]?.toUpperCase()}</div>
+                  <span>{remark.assignedTo}</span>
+                </div>
+              </section>
+            </>
           )}
 
           {remark.adminNotes && (
-            <div className="detail-section admin-notes">
-              <h3>💬 Notes de l'administration</h3>
-              <p>{remark.adminNotes}</p>
-            </div>
+            <>
+              <div className="rdp-divider"></div>
+              <section className="rdp-section">
+                <h3 className="rdp-section-title">Note de l'administration</h3>
+                <div className="rdp-admin-note">
+                  <p>{remark.adminNotes}</p>
+                </div>
+              </section>
+            </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
