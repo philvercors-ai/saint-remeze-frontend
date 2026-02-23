@@ -26,9 +26,8 @@ function RemarkDetailPage() {
       if (!response.ok) throw new Error('Erreur chargement');
 
       const data = await response.json();
-      const remarkData = data.data || data;
-      console.log('✅ [CORRECT] Remarque chargée:', remarkData);
-      setRemark(remarkData);
+      console.log('✅ [CORRECT] Remarque chargée:', data.data);
+      setRemark(data.data);
       setLoading(false);
     } catch (err) {
       console.error('❌ [CORRECT] Erreur:', err);
@@ -104,7 +103,7 @@ function RemarkDetailPage() {
         <div className="error-container">
           <h2>❌ Erreur</h2>
           <p>{error || 'Remarque introuvable'}</p>
-          <button className="btn-primary" onClick={() => navigate('/my-remarks')}>
+          <button className="btn-primary" onClick={() => navigate('/')}>
             Retour
           </button>
         </div>
@@ -117,7 +116,7 @@ function RemarkDetailPage() {
   return (
     <div className="detail-page">
       <div className="detail-header">
-        <button className="btn-back" onClick={() => navigate('/my-remarks')}>
+        <button className="btn-back" onClick={() => navigate('/')}>
           ← Retour
         </button>
         <h1>Détails de la remarque</h1>
