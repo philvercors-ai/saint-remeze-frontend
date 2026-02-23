@@ -27,6 +27,7 @@ function RemarkDetailPage() {
 
       const data = await response.json();
       console.log('✅ [CORRECT] Remarque chargée:', data.data);
+      const remarkData = data.data || data;
       setRemark(data.data);
       setLoading(false);
     } catch (err) {
