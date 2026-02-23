@@ -12,7 +12,7 @@ function RemarkDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('📋 Chargement remarque:', id);
+    console.log('📋 [CORRECT] Chargement remarque:', id);
     fetchRemarkDetail();
   }, [id]);
 
@@ -26,64 +26,63 @@ function RemarkDetailPage() {
       if (!response.ok) throw new Error('Erreur chargement');
 
       const data = await response.json();
-      console.log('✅ Remarque chargée:', data.data);
+      console.log('✅ [CORRECT] Remarque chargée:', data.data);
       setRemark(data.data);
       setLoading(false);
     } catch (err) {
-      console.error('❌ Erreur:', err);
+      console.error('❌ [CORRECT] Erreur:', err);
       setError(err.message);
       setLoading(false);
     }
   };
 
-  // FONCTION DE CORRECTION URL INTÉGRÉE
+  // FONCTION CORRECTION URL CLOUDINARY
   const getImageUrl = (remarkData) => {
-    console.log('🔍 [INLINE] getImageUrl appelé');
-    console.log('🔍 [INLINE] remarkData:', remarkData);
+    console.log('🔍 [CORRECT] getImageUrl appelé avec:', remarkData);
     
     if (!remarkData) {
-      console.log('❌ [INLINE] Pas de données');
+      console.log('❌ [CORRECT] Pas de données');
       return null;
     }
 
-    // Fonction de correction
+    // Fonction de correction URL
     const fixUrl = (url) => {
       if (!url) return null;
       
-      console.log('🔧 [INLINE] Avant correction:', url);
+      console.log('🔧 [CORRECT] URL originale:', url);
       
-      // CORRECTION : https// → https://
-      let fixed = url;
-      if (fixed.includes('https//')) {
-        fixed = fixed.replace(/https\/\//g, 'https://');
-        console.log('✅ [INLINE] CORRIGÉ https//:', fixed);
-      }
-      if (fixed.includes('http//')) {
-        fixed = fixed.replace(/http\/\//g, 'http://');
-        console.log('✅ [INLINE] CORRIGÉ http//:', fixed);
+      // CORRECTION 1 : https// → https://
+      let fixed = url.replace(/https\/\//g, 'https://');
+      
+      // CORRECTION 2 : http// → http://
+      fixed = fixed.replace(/http\/\//g, 'http://');
+      
+      if (fixed !== url) {
+        console.log('✅ [CORRECT] URL CORRIGÉE:', url, '→', fixed);
+      } else {
+        console.log('✅ [CORRECT] URL OK (pas besoin de correction)');
       }
       
-      console.log('🔧 [INLINE] Après correction:', fixed);
       return fixed;
     };
 
     // Vérifier photoUrl
     if (remarkData.photoUrl) {
-      console.log('📸 [INLINE] photoUrl trouvé:', remarkData.photoUrl);
+      console.log('📸 [CORRECT] photoUrl trouvé:', remarkData.photoUrl);
       const fixed = fixUrl(remarkData.photoUrl);
-      console.log('📸 [INLINE] photoUrl final:', fixed);
+      console.log('🖼️ [CORRECT] URL finale:', fixed);
       return fixed;
     }
 
     // Vérifier image
     if (remarkData.image) {
-      console.log('📸 [INLINE] image trouvé:', remarkData.image);
+      console.log('📸 [CORRECT] image trouvé:', remarkData.image);
       const fixed = fixUrl(remarkData.image);
-      console.log('📸 [INLINE] image final:', fixed);
+      console.log('🖼️ [CORRECT] URL finale:', fixed);
       return fixed;
     }
 
-    console.log('❌ [INLINE] Aucune photo');
+    console.log('❌ [CORRECT] Aucune photo trouvée');
     return null;
   };
 
@@ -104,7 +103,7 @@ function RemarkDetailPage() {
         <div className="error-container">
           <h2>❌ Erreur</h2>
           <p>{error || 'Remarque introuvable'}</p>
-          <button className="btn-primary" onClick={() => navigate('/my-remarks')}>
+          <button className="btn-primary" onClick={() => navigate('/')}>
             Retour
           </button>
         </div>
@@ -113,12 +112,11 @@ function RemarkDetailPage() {
   }
 
   const imageUrl = getImageUrl(remark);
-  console.log('🖼️ [INLINE] URL finale:', imageUrl);
 
   return (
     <div className="detail-page">
       <div className="detail-header">
-        <button className="btn-back" onClick={() => navigate('/my-remarks')}>
+        <button className="btn-back" onClick={() => navigate('/')}>
           ← Retour
         </button>
         <h1>Détails de la remarque</h1>
@@ -157,7 +155,7 @@ function RemarkDetailPage() {
                   src={imageUrl} 
                   alt={remark.title}
                   onError={(e) => {
-                    console.error('❌ [INLINE] Erreur chargement image:', imageUrl);
+                    console.error('❌ [CORRECT] Erreur chargement:', imageUrl);
                     e.target.style.display = 'none';
                     const errorDiv = document.createElement('div');
                     errorDiv.style.padding = '1rem';
@@ -168,7 +166,7 @@ function RemarkDetailPage() {
                     e.target.parentElement.appendChild(errorDiv);
                   }}
                   onLoad={() => {
-                    console.log('✅ [INLINE] Image chargée avec succès:', imageUrl);
+                    console.log('✅ [CORRECT] Image chargée:', imageUrl);
                   }}
                   crossOrigin="anonymous"
                   style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
