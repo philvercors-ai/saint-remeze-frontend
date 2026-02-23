@@ -95,23 +95,23 @@ function RemarkDetailPage() {
         <div></div>
       </header>
 
-      <main className="rdp-main">
-        {imageUrl ? (
-          <div className="rdp-image-wrapper">
-            <img
-              src={imageUrl}
-              alt={remark.title}
-              className="rdp-hero-image"
-              onError={(e) => { e.target.parentElement.style.display = 'none'; }}
-            />
-          </div>
-        ) : (
-          <div className="rdp-no-image">
-            <span>📷</span>
-            <p>Aucune photo jointe</p>
-          </div>
-        )}
+      {imageUrl ? (
+        <div className="rdp-image-wrapper">
+          <img
+            src={imageUrl}
+            alt={remark.title}
+            className="rdp-hero-image"
+            onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+          />
+        </div>
+      ) : (
+        <div className="rdp-no-image">
+          <span>📷</span>
+          <p>Aucune photo jointe</p>
+        </div>
+      )}
 
+      <main className="rdp-main">
         <div className="rdp-card">
           <div className="rdp-meta">
             <span className="rdp-status" style={{ color: statusConfig.color, background: statusConfig.bg }}>
