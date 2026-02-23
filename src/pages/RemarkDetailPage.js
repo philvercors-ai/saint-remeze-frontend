@@ -26,9 +26,9 @@ function RemarkDetailPage() {
       if (!response.ok) throw new Error('Erreur chargement');
 
       const data = await response.json();
-      console.log('✅ [CORRECT] Remarque chargée:', data.data);
       const remarkData = data.data || data;
-      setRemark(data.data);
+      console.log('✅ [CORRECT] Remarque chargée:', remarkData);
+      setRemark(remarkData);
       setLoading(false);
     } catch (err) {
       console.error('❌ [CORRECT] Erreur:', err);
