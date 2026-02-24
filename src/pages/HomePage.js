@@ -10,10 +10,22 @@ function HomePage() {
   const [remarks, setRemarks] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, progress: 0, done: 0 });
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     loadData();
+    loadUnreadCount();
   }, []);
+
+  const loadUnreadCount = async () => {
+    try {
+      const result = await apiService.getNotifications();
+      const data = result.data || (Array.isArray(result) ? result : []);
+      setUnreadCount(data.filter(n => !n.read).length);
+    } catch (error) {
+      console.error('Erreur notifications:', error);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -75,7 +87,7 @@ function HomePage() {
           <div className="header-actions">
             <button className="btn btn-icon" onClick={() => navigate('/notifications')} title="Notifications">
               🔔
-              {stats.pending > 0 && <span className="badge">{stats.pending}</span>}
+              {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
             </button>
             
             <button className="btn btn-icon" onClick={() => logout()} title="Déconnexion">
