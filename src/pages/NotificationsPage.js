@@ -85,6 +85,8 @@ function NotificationsPage() {
       </div>
     </div>
   );
+
+  console.log('🔔 Résultat brut notifications:', JSON.stringify(result));
 }
 
 export default NotificationsPage;
