@@ -15,9 +15,8 @@ function NotificationsPage() {
   const loadNotifications = async () => {
     try {
       const result = await apiService.getNotifications();
-      if (result.success) {
-        setNotifications(result.data);
-      }
+      const data = result.data || (Array.isArray(result) ? result : []);
+      setNotifications(data);
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
@@ -27,7 +26,7 @@ function NotificationsPage() {
 
   const handleMarkAsRead = async (id) => {
     try {
-      await apiService.markAsRead(id);
+      await apiService.markNotificationRead(id);
       loadNotifications();
     } catch (error) {
       console.error('Erreur:', error);
@@ -36,7 +35,7 @@ function NotificationsPage() {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await apiService.markAllAsRead();
+      await apiService.markAllNotificationsRead();
       loadNotifications();
     } catch (error) {
       console.error('Erreur:', error);
