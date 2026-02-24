@@ -23,8 +23,7 @@ function RemarkDetailPage() {
       });
       if (!response.ok) throw new Error('Erreur chargement');
       const data = await response.json();
-      const remarkData = data.data || data;
-      setRemark(remarkData);
+      setRemark(data.data || data);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -36,24 +35,27 @@ function RemarkDetailPage() {
     if (!remarkData) return null;
     const fixUrl = (url) => {
       if (!url) return null;
-      let fixed = url.replace(/https\/\//g, 'https://');
-      fixed = fixed.replace(/http\/\//g, 'http://');
-      return fixed;
+      return url.replace(/https\/\//g, 'https://').replace(/http\/\//g, 'http://');
     };
     if (remarkData.photoUrl) return fixUrl(remarkData.photoUrl);
     if (remarkData.image) return fixUrl(remarkData.image);
     return null;
   };
 
-  const getStatusConfig = (status) => {
-    const configs = {
-      'Terminée':  { color: '#059669', bg: '#d1fae5', label: 'Terminée' },
-      'En cours':  { color: '#2563eb', bg: '#dbeafe', label: 'En cours' },
-      'Rejetée':   { color: '#dc2626', bg: '#fee2e2', label: 'Rejetée' },
-      'En attente':{ color: '#d97706', bg: '#fef3c7', label: 'En attente' },
+  const getStatusStyle = (status) => {
+    const map = {
+      'Terminée':   '#059669',
+      'En cours':   '#2563eb',
+      'Rejetée':    '#dc2626',
+      'En attente': '#d97706',
     };
-    return configs[status] || configs['En attente'];
+    return { color: map[status] || '#d97706' };
   };
+
+  const formatDate = (dateStr) =>
+    new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
 
   if (loading) {
     return (
@@ -82,114 +84,126 @@ function RemarkDetailPage() {
   }
 
   const imageUrl = getImageUrl(remark);
-  const statusConfig = getStatusConfig(remark.status);
 
   return (
     <div className="rdp-page">
       <header className="rdp-header">
         <button className="rdp-back-btn" onClick={() => navigate('/')}>
-          <span>←</span>
-          <span>Retour</span>
+          ← Retour
         </button>
-        <span className="rdp-header-label">Remarque citoyenne</span>
+        <span className="rdp-header-label">Mairie de Saint-Remèze</span>
         <div></div>
       </header>
 
-      {imageUrl ? (
-        <div className="rdp-image-wrapper">
-          <img
-            src={imageUrl}
-            alt={remark.title}
-            className="rdp-hero-image"
-            onError={(e) => { e.target.parentElement.style.display = 'none'; }}
-          />
-        </div>
-      ) : (
-        <div className="rdp-no-image">
-          <span>📷</span>
-          <p>Aucune photo jointe</p>
-        </div>
-      )}
-
       <main className="rdp-main">
-        <div className="rdp-card">
-          <div className="rdp-meta">
-            <span className="rdp-status" style={{ color: statusConfig.color, background: statusConfig.bg }}>
-              <span className="rdp-status-dot" style={{ background: statusConfig.color }}></span>
-              {statusConfig.label}
-            </span>
-            <span className="rdp-date">
-              {new Date(remark.createdAt).toLocaleDateString('fr-FR', {
-                day: 'numeric', month: 'long', year: 'numeric'
-              })}
-            </span>
+        <div className="rdp-document">
+
+          {/* Bandeau supérieur */}
+          <div className="rdp-doc-topbar">
+            Mairie de Saint-Remèze — Rapport de signalement
           </div>
 
-          <h1 className="rdp-title">{remark.title}</h1>
+          <div className="rdp-doc-body">
 
-          <div className="rdp-category">
-            <span>📁</span>
-            {remark.category}
+            {/* Titre */}
+            <h1 className="rdp-title">{remark.title}</h1>
+
+            {/* Statut */}
+            <div className="rdp-status-line">
+              <span className="rdp-status-label">STATUT :</span>
+              <span className="rdp-status-value" style={getStatusStyle(remark.status)}>
+                {remark.status?.toUpperCase()}
+              </span>
+            </div>
+
+            {/* Déclarant / Catégorie */}
+            <div className="rdp-info-grid">
+              <div className="rdp-info-cell">
+                <div className="rdp-info-key">Déclarant :</div>
+                <div className="rdp-info-val">{remark.userName || remark.user?.name || 'Inconnu'}</div>
+                <div className="rdp-info-sub">
+                  {remark.userEmail || remark.user?.email
+                    ? `Email : ${remark.userEmail || remark.user?.email}`
+                    : ''}
+                  {(remark.userPhone || remark.user?.phone)
+                    ? ` | Tél : ${remark.userPhone || remark.user?.phone}`
+                    : ''}
+                </div>
+                <div className="rdp-info-sub">
+                  Signalé le {formatDate(remark.createdAt)}
+                </div>
+              </div>
+              <div className="rdp-info-cell">
+                <div className="rdp-info-key">Catégorie :</div>
+                <div className="rdp-info-val">{remark.category}</div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="rdp-desc-block">
+              <div className="rdp-desc-title">Description du déclarant :</div>
+              <p className="rdp-desc-text">{remark.description}</p>
+            </div>
+
+            <div className="rdp-divider"></div>
+
+            {/* Assigné / Notes admin */}
+            <div className="rdp-admin-box">
+              <div className="rdp-admin-row">
+                <span className="rdp-admin-key">Assigné à :</span>
+                <span className="rdp-admin-val">{remark.assignedTo || 'Non assigné'}</span>
+              </div>
+              <div className="rdp-admin-row">
+                <span className="rdp-admin-key">Notes admin :</span>
+                <span className="rdp-admin-val">{remark.adminNotes || 'Aucune note enregistrée.'}</span>
+              </div>
+            </div>
+
+            {/* Localisation */}
+            {remark.location?.coordinates && (
+              <>
+                <div className="rdp-divider"></div>
+                <div className="rdp-location-block">
+                  <div className="rdp-location-title">Localisation :</div>
+                  <div className="rdp-coords">
+                    <span>
+                      <span className="rdp-coord-label">Latitude :</span>
+                      {remark.location.coordinates[1].toFixed(6)}
+                    </span>
+                    <span>
+                      <span className="rdp-coord-label">Longitude :</span>
+                      {remark.location.coordinates[0].toFixed(6)}
+                    </span>
+                  </div>
+                  <a
+                    href={`https://www.google.com/maps?q=${remark.location.coordinates[1]},${remark.location.coordinates[0]}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rdp-map-btn"
+                  >
+                    🗺️ Voir sur Google Maps
+                  </a>
+                </div>
+              </>
+            )}
+
+            {/* Photo */}
+            {imageUrl && (
+              <>
+                <div className="rdp-divider"></div>
+                <div className="rdp-photo-block">
+                  <div className="rdp-photo-title">Photo jointe :</div>
+                  <img
+                    src={imageUrl}
+                    alt={remark.title}
+                    className="rdp-photo-img"
+                    onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+                  />
+                </div>
+              </>
+            )}
+
           </div>
-
-          <div className="rdp-divider"></div>
-
-          <section className="rdp-section">
-            <h3 className="rdp-section-title">Description</h3>
-            <p className="rdp-description">{remark.description}</p>
-          </section>
-
-          {remark.location?.coordinates && (
-            <>
-              <div className="rdp-divider"></div>
-              <section className="rdp-section">
-                <h3 className="rdp-section-title">Localisation</h3>
-                <div className="rdp-coords">
-                  <div className="rdp-coord-item">
-                    <span className="rdp-coord-label">Latitude</span>
-                    <span className="rdp-coord-value">{remark.location.coordinates[1].toFixed(6)}</span>
-                  </div>
-                  <div className="rdp-coord-item">
-                    <span className="rdp-coord-label">Longitude</span>
-                    <span className="rdp-coord-value">{remark.location.coordinates[0].toFixed(6)}</span>
-                  </div>
-                </div>
-                <a
-                  href={`https://www.google.com/maps?q=${remark.location.coordinates[1]},${remark.location.coordinates[0]}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rdp-map-btn"
-                >
-                  🗺️ Voir sur Google Maps
-                </a>
-              </section>
-            </>
-          )}
-
-          {remark.assignedTo && (
-            <>
-              <div className="rdp-divider"></div>
-              <section className="rdp-section">
-                <h3 className="rdp-section-title">Assigné à</h3>
-                <div className="rdp-assigned">
-                  <div className="rdp-avatar">{remark.assignedTo[0]?.toUpperCase()}</div>
-                  <span>{remark.assignedTo}</span>
-                </div>
-              </section>
-            </>
-          )}
-
-          {remark.adminNotes && (
-            <>
-              <div className="rdp-divider"></div>
-              <section className="rdp-section">
-                <h3 className="rdp-section-title">Note de l'administration</h3>
-                <div className="rdp-admin-note">
-                  <p>{remark.adminNotes}</p>
-                </div>
-              </section>
-            </>
-          )}
         </div>
       </main>
     </div>
