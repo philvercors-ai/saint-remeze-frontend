@@ -1,8 +1,9 @@
 {
-  "short_name": "Saint-Remèze",
+  "short_name": "St-Remèze",
   "name": "Saint-Remèze - Application Citoyenne",
   "description": "Signalez des problèmes à la mairie de Saint-Remèze",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#2c5f8a",
