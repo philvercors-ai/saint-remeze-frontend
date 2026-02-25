@@ -357,7 +357,7 @@ function AddRemarkPage() {
               ) : (
                 <>
                   <span>📍</span>
-                  <span>Obtenir ma position</span>
+                  <span>Partager ma position</span>
                 </>
               )}
             </button>
