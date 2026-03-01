@@ -15,6 +15,17 @@
     <meta name="apple-mobile-web-app-title" content="Saint-Remèze" />
     <link rel="apple-touch-icon" href="/logo192.png" />
 
+    <!-- Capture PWA install prompt AVANT le chargement de React -->
+    <script>
+      window.__pwaInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        window.__pwaInstallPrompt = e;
+        // Notifie React si le composant est déjà monté
+        window.dispatchEvent(new Event('pwaInstallReady'));
+      });
+    </script>
+
     <!-- Service Worker -->
     <script>
       if ('serviceWorker' in navigator) {
