@@ -1,6 +1,6 @@
 // src/services/apiService.js
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://saint-remeze-backend.onrender.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://saint-remeze-backend-dev.onrender.com';
 
 console.log('🌐 API URL:', API_URL);
 
