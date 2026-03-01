@@ -101,9 +101,15 @@ function LoginPage() {
             />
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
+          <div style={{ textAlign: 'right', marginBottom: '20px', marginTop: '-8px' }}>
+            <Link to="/forgot-password" style={{ color: '#2563eb', fontSize: '13px', fontWeight: '500' }}>
+              Mot de passe oublié ?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
             disabled={loading}
           >
             {loading ? 'Connexion...' : 'Se connecter'}

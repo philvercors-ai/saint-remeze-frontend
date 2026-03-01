@@ -47,6 +47,7 @@ function RemarkDetailPage() {
       'Terminée':   '#059669',
       'En cours':   '#2563eb',
       'Rejetée':    '#dc2626',
+      'Vue':        '#7c3aed',
       'En attente': '#d97706',
     };
     return { color: map[status] || '#d97706' };

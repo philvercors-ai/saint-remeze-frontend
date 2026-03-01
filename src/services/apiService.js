@@ -214,8 +214,37 @@ async createRemark(remarkData) {
 
 async getRemarkById(id) {
     return this.getRemark(id);
-  }
+  },
 
+  // ============================
+  // MOT DE PASSE OUBLIÉ
+  // ============================
+
+  async forgotPassword(email) {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
+  },
+
+  async resetPassword(token, password) {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/reset-password/${token}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
+  }
 
 };
 

@@ -68,6 +68,7 @@ function HomePage() {
   const getStatusClass = (status) => {
     const map = {
       'En attente': 'status-en-attente',
+      'Vue': 'status-vue',
       'En cours': 'status-en-cours',
       'Terminée': 'status-terminee',
       'Rejetée': 'status-rejetee'

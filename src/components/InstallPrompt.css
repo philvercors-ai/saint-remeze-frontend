@@ -1,0 +1,153 @@
+/* ===== BANNIÈRE D'INSTALLATION PWA ===== */
+
+.install-banner {
+  position: fixed;
+  bottom: 100px; /* au-dessus du bouton "Nouvelle remarque" (bottom: 20px + ~52px) */
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 500px;
+  z-index: 60;
+  background: white;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  animation: installSlideUp 0.3s ease;
+}
+
+@keyframes installSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.install-banner-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.install-banner-text {
+  flex: 1;
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.install-banner-btn {
+  padding: 8px 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  min-height: unset;
+  min-width: unset;
+  height: 36px;
+  transition: background 0.2s;
+}
+
+.install-banner-btn:active {
+  background: #1d4ed8;
+}
+
+.install-banner-close {
+  width: 36px;
+  height: 36px;
+  min-height: unset;
+  min-width: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.install-banner-close:active {
+  background: #e2e8f0;
+}
+
+/* ===== MODAL iOS ===== */
+
+.ios-install-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.ios-install-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  animation: installSlideUp 0.25s ease;
+}
+
+.ios-install-modal h3 {
+  font-size: 17px;
+  color: #1e293b;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+}
+
+.ios-install-steps {
+  padding-left: 20px;
+  margin: 0 0 20px 0;
+}
+
+.ios-install-steps li {
+  font-size: 15px;
+  color: #475569;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.ios-share-icon {
+  font-size: 16px;
+}
+
+.ios-install-done {
+  width: 100%;
+  padding: 14px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: unset;
+  height: 50px;
+  transition: background 0.2s;
+}
+
+.ios-install-done:active {
+  background: #1d4ed8;
+}
