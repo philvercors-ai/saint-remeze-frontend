@@ -246,6 +246,120 @@
   color: #64748b;
 }
 
+/* ===== VERSION BADGE ===== */
+.version-badge {
+  font-size: 10px;
+  background: #e0e7ff;
+  color: #3730a3;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.version-badge:active { background: #c7d2fe; }
+
+/* ===== CHANGELOG MODAL ===== */
+.changelog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.changelog-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.changelog-modal h2 {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0 0 20px 0;
+}
+
+.cl-version { margin-bottom: 20px; }
+
+.cl-version-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cl-tag {
+  font-size: 11px;
+  font-weight: 700;
+  background: #2563eb;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.cl-tag.current { background: #10b981; }
+
+.cl-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.cl-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cl-list li {
+  font-size: 13px;
+  color: #475569;
+  padding: 3px 0 3px 14px;
+  position: relative;
+}
+
+.cl-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #2563eb;
+}
+
+.cl-list code {
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: #334155;
+}
+
+.changelog-footer {
+  text-align: right;
+  margin-top: 16px;
+}
+
+.btn-close-changelog {
+  background: #64748b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-close-changelog:active { opacity: 0.8; }
+
 /* ===== TABLETTE (640px+) ===== */
 @media (min-width: 640px) {
   .header {

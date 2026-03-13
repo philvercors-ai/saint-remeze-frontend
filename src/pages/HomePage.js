@@ -11,6 +11,7 @@ function HomePage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, progress: 0, done: 0 });
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showChangelog, setShowChangelog] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -83,6 +84,7 @@ function HomePage() {
           <div className="header-logo">
             <img src="/logo-saint-remeze.png" alt="Logo" onError={(e) => e.target.style.display='none'} />
             <h1>Saint-Remèze</h1>
+            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.3</button>
           </div>
           
           <div className="header-actions">
@@ -150,6 +152,67 @@ function HomePage() {
           ➕ Nouvelle remarque
         </button>
       </div>
+
+      {showChangelog && (
+        <div className="changelog-overlay" onClick={() => setShowChangelog(false)}>
+          <div className="changelog-modal" onClick={e => e.stopPropagation()}>
+            <h2>📋 Historique des versions</h2>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag current">v7.2.3</span>
+                <span className="cl-date">13 mars 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Correction export PDF/CSV : numéro de téléphone maintenant affiché</li>
+                <li>Fix populate MongoDB : ajout du champ <code>phone</code> dans les requêtes admin</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.2</span>
+                <span className="cl-date">13 mars 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Correction variable Vercel : <code>REACT_APP_API_URL</code> pointait sur le backend DEV</li>
+                <li>Fix <code>vercel.json</code> : conflit headers + routes résolu</li>
+                <li>Correction vulnérabilité sécurité Multer (v2.1.0)</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.1</span>
+                <span className="cl-date">Mars 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Ajout statut "Vue" pour les signalements consultés par l'admin</li>
+                <li>Réinitialisation de mot de passe par email (token sécurisé)</li>
+                <li>Support PWA (Progressive Web App) sur iOS et Android</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.0</span>
+                <span className="cl-date">Février 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Mise en production PROD (Render + Vercel + MongoDB Atlas)</li>
+                <li>Export PDF avec graphiques et export CSV complet</li>
+                <li>Archivage automatique et suppression après 1 an</li>
+                <li>Authentification JWT + rôles admin/user</li>
+                <li>Upload photos via Cloudinary, géolocalisation GPS</li>
+              </ul>
+            </div>
+
+            <div className="changelog-footer">
+              <button className="btn-close-changelog" onClick={() => setShowChangelog(false)}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
