@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap');
+/* RemarkDetailPage.css — Design system Navy/Gold/Beige */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .rdp-page {
   min-height: 100vh;
-  background: #ebebeb;
-  font-family: 'Source Sans 3', Arial, sans-serif;
-  color: #1a1a1a;
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  color: var(--color-text);
 }
 
 /* ── Header ── */
@@ -18,33 +18,35 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  height: 50px;
-  background: #2c5f8a;
+  height: 52px;
+  background: var(--color-navy);
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
 
 .rdp-back-btn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background: none;
+  background: rgba(255,255,255,.12);
   border: none;
-  font-family: 'Source Sans 3', Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   font-weight: 600;
   color: #fff;
   cursor: pointer;
-  padding: 0.3rem 0.7rem;
-  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
   transition: background 0.15s;
+  min-height: unset;
 }
-.rdp-back-btn:hover { background: rgba(255,255,255,0.15); }
+.rdp-back-btn:hover { background: rgba(255,255,255,.22); }
 
 .rdp-header-label {
   font-size: 0.72rem;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255,255,255,.6);
 }
 
 /* ── Wrapper ── */
@@ -56,30 +58,31 @@
 
 /* ── Document card ── */
 .rdp-document {
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
 }
 
 /* ── Top bar ── */
 .rdp-doc-topbar {
-  background: #f5f5f5;
-  border-bottom: 1px solid #ddd;
+  background: var(--color-navy);
   padding: 0.55rem 1.75rem;
   font-size: 0.72rem;
-  color: #999;
+  color: rgba(255,255,255,.6);
   letter-spacing: 0.04em;
 }
 
 /* ── Body ── */
-.rdp-doc-body {
-  padding: 2rem 2.5rem 2.5rem;
-}
+.rdp-doc-body { padding: 2rem 2.5rem 2.5rem; }
 
 /* ── Title ── */
 .rdp-title {
-  font-size: 1.65rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #2c5f8a;
+  color: var(--color-navy);
   margin-bottom: 1rem;
   line-height: 1.2;
 }
@@ -92,71 +95,77 @@
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 }
-.rdp-status-label { font-weight: 700; color: #222; }
+.rdp-status-label { font-weight: 700; color: var(--color-navy); }
 .rdp-status-value { font-weight: 700; font-size: 0.9rem; }
 
 /* ── Info grid ── */
 .rdp-info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   margin-bottom: 1.5rem;
+  overflow: hidden;
 }
 .rdp-info-cell { padding: 0.75rem 1rem; }
-.rdp-info-cell:first-child { border-right: 1px solid #ddd; }
-.rdp-info-key { font-size: 0.8rem; font-weight: 700; color: #222; margin-bottom: 0.2rem; }
-.rdp-info-val { font-size: 0.9rem; font-weight: 600; color: #111; }
-.rdp-info-sub { font-size: 0.78rem; color: #666; margin-top: 0.15rem; }
+.rdp-info-cell:first-child { border-right: 1px solid var(--color-border); }
+.rdp-info-key { font-size: 0.8rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.2rem; }
+.rdp-info-val { font-size: 0.9rem; font-weight: 600; color: var(--color-text); }
+.rdp-info-sub { font-size: 0.78rem; color: var(--color-muted); margin-top: 0.15rem; }
 
 /* ── Description ── */
 .rdp-desc-block { margin-bottom: 1.5rem; }
-.rdp-desc-title { font-size: 0.88rem; font-weight: 700; color: #222; margin-bottom: 0.35rem; }
+.rdp-desc-title { font-size: 0.88rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.35rem; }
 .rdp-desc-text { font-size: 0.9rem; line-height: 1.65; color: #444; }
 
 /* ── Divider ── */
-.rdp-divider { height: 1px; background: #e5e5e5; margin: 1.25rem 0; }
+.rdp-divider { height: 1px; background: var(--color-border); margin: 1.25rem 0; }
 
 /* ── Admin box ── */
 .rdp-admin-box {
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-gold);
   padding: 0.85rem 1rem;
   margin-bottom: 1.75rem;
-  background: #fafafa;
+  background: #fdf8f0;
+  border-radius: var(--radius-md);
 }
 .rdp-admin-row { display: flex; gap: 0.5rem; font-size: 0.88rem; line-height: 1.5; }
 .rdp-admin-row + .rdp-admin-row { margin-top: 0.3rem; }
-.rdp-admin-key { font-weight: 700; color: #222; min-width: 100px; }
+.rdp-admin-key { font-weight: 700; color: var(--color-navy); min-width: 100px; }
 .rdp-admin-val { color: #444; }
 
 /* ── Location ── */
 .rdp-location-block { margin-bottom: 1.5rem; }
-.rdp-location-title { font-size: 0.88rem; font-weight: 700; color: #222; margin-bottom: 0.5rem; }
+.rdp-location-title { font-size: 0.88rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.5rem; }
 .rdp-coords { display: flex; gap: 2rem; font-size: 0.88rem; color: #444; margin-bottom: 0.75rem; }
-.rdp-coord-label { font-weight: 700; color: #333; margin-right: 0.25rem; }
+.rdp-coord-label { font-weight: 700; color: var(--color-navy); margin-right: 0.25rem; }
 .rdp-map-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 1rem;
-  background: #2c5f8a;
+  padding: 0.5rem 1rem;
+  background: var(--color-navy);
   color: #fff;
-  border-radius: 3px;
+  border-radius: var(--radius-md);
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
   transition: background 0.15s;
+  min-height: unset;
 }
-.rdp-map-btn:hover { background: #1e4a6e; }
+.rdp-map-btn:hover { background: #0f2a44; }
 
 /* ── Photo ── */
 .rdp-photo-block { margin-top: 0.25rem; }
-.rdp-photo-title { font-size: 0.88rem; font-weight: 700; color: #222; margin-bottom: 0.75rem; }
+.rdp-photo-title { font-size: 0.88rem; font-weight: 700; color: var(--color-navy); margin-bottom: 0.75rem; }
 .rdp-photo-img {
   display: block;
   max-width: 420px;
   width: 100%;
   height: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   margin: 0 auto;
 }
 
@@ -164,12 +173,12 @@
 .rdp-loading {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; height: 100vh; gap: 1rem;
-  color: #666; font-size: 0.9rem;
+  color: var(--color-muted); font-size: 0.9rem;
 }
 .rdp-spinner {
   width: 34px; height: 34px;
-  border: 3px solid #e5e7eb;
-  border-top-color: #2c5f8a;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-navy);
   border-radius: 50%;
   animation: rdp-spin 0.7s linear infinite;
 }
@@ -186,22 +195,22 @@
   border-radius: 50%; display: flex; align-items: center;
   justify-content: center; font-size: 1.4rem; font-weight: 700;
 }
-.rdp-error-box h2 { font-size: 1.2rem; color: #111; }
-.rdp-error-box p { font-size: 0.9rem; color: #666; }
+.rdp-error-box h2 { font-family: var(--font-display); font-size: 1.2rem; color: var(--color-navy); }
+.rdp-error-box p { font-size: 0.9rem; color: var(--color-muted); }
 .rdp-btn-back {
   margin-top: 0.5rem; padding: 0.65rem 1.3rem;
-  background: #2c5f8a; color: #fff; border: none;
-  border-radius: 4px; font-size: 0.9rem; font-weight: 600;
-  cursor: pointer; transition: background 0.15s;
+  background: var(--color-navy); color: #fff; border: none;
+  border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; min-height: unset;
 }
-.rdp-btn-back:hover { background: #1e4a6e; }
+.rdp-btn-back:hover { background: #0f2a44; }
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .rdp-doc-body { padding: 1.25rem; }
   .rdp-info-grid { grid-template-columns: 1fr; }
-  .rdp-info-cell:first-child { border-right: none; border-bottom: 1px solid #ddd; }
-  .rdp-title { font-size: 1.25rem; }
+  .rdp-info-cell:first-child { border-right: none; border-bottom: 1px solid var(--color-border); }
+  .rdp-title { font-size: 1.2rem; }
   .rdp-main { margin: 0.5rem auto; }
   .rdp-coords { flex-direction: column; gap: 0.4rem; }
 }

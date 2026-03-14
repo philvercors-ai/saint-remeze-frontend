@@ -1,19 +1,23 @@
+/* AuthPages.css — Design system Navy/Gold/Beige */
+
 .auth-page {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg);
   padding: 20px;
 }
 
 .auth-container {
-  background: white;
+  background: var(--color-white);
   padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 24px rgba(26,58,90,.12);
   max-width: 400px;
   width: 100%;
+  border-top: 4px solid var(--color-gold);
+  animation: fadein .3s ease;
 }
 
 .logo-container {
@@ -27,24 +31,28 @@
 
 .auth-container h1 {
   text-align: center;
-  color: #1e293b;
+  font-family: var(--font-display);
+  color: var(--color-navy);
+  font-size: 22px;
   margin-bottom: 8px;
 }
 
 .subtitle {
   text-align: center;
-  color: #64748b;
+  color: var(--color-muted);
+  font-size: 14px;
   margin-bottom: 30px;
 }
 
 .link-text {
   text-align: center;
   margin-top: 20px;
-  color: #64748b;
+  color: var(--color-muted);
+  font-size: 14px;
 }
 
 .link-text a {
-  color: #2563eb;
+  color: var(--color-gold);
   text-decoration: none;
   font-weight: 600;
 }
