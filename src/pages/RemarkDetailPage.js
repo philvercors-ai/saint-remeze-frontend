@@ -31,17 +31,6 @@ function RemarkDetailPage() {
     }
   };
 
-  const getImageUrl = (remarkData) => {
-    if (!remarkData) return null;
-    const fixUrl = (url) => {
-      if (!url) return null;
-      return url.replace(/https\/\//g, 'https://').replace(/http\/\//g, 'http://');
-    };
-    if (remarkData.photoUrl) return fixUrl(remarkData.photoUrl);
-    if (remarkData.image) return fixUrl(remarkData.image);
-    return null;
-  };
-
   const getStatusStyle = (status) => {
     const map = {
       'Terminée':   '#059669',
@@ -83,8 +72,6 @@ function RemarkDetailPage() {
       </div>
     );
   }
-
-  const imageUrl = getImageUrl(remark);
 
   return (
     <div className="rdp-page">
@@ -188,21 +175,34 @@ function RemarkDetailPage() {
               </>
             )}
 
-            {/* Photo */}
-            {imageUrl && (
-              <>
-                <div className="rdp-divider"></div>
-                <div className="rdp-photo-block">
-                  <div className="rdp-photo-title">Photo jointe :</div>
-                  <img
-                    src={imageUrl}
-                    alt={remark.title}
-                    className="rdp-photo-img"
-                    onError={(e) => { e.target.parentElement.style.display = 'none'; }}
-                  />
-                </div>
-              </>
-            )}
+            {/* Photos */}
+            {(() => {
+              const allPhotos = remark.photos?.length > 0
+                ? remark.photos.map(p => p.url)
+                : (remark.photoUrl ? [remark.photoUrl] : []);
+              if (allPhotos.length === 0) return null;
+              return (
+                <>
+                  <div className="rdp-divider"></div>
+                  <div className="rdp-photo-block">
+                    <div className="rdp-photo-title">
+                      Photo{allPhotos.length > 1 ? 's jointes' : ' jointe'} :
+                    </div>
+                    <div className="rdp-photos-grid">
+                      {allPhotos.map((url, i) => (
+                        <img
+                          key={i}
+                          src={url.replace(/https\/\//g, 'https://').replace(/http\/\//g, 'http://')}
+                          alt={`${remark.title} - photo ${i + 1}`}
+                          className={allPhotos.length === 1 ? 'rdp-photo-img' : 'rdp-photo-thumb'}
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
 
           </div>
         </div>
