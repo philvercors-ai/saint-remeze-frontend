@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/apiService';
 import './AddRemarkPage.css';
@@ -22,55 +22,86 @@ const MAX_PHOTOS = 3;
 function AddRemarkPage() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
   const [formData, setFormData] = useState({
     category: '',
     title: '',
     description: '',
-    photos: [],        // [{ file, preview }]
+    photos: [],
     location: null
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [gettingLocation, setGettingLocation] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
 
-  const compressImage = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          let width = img.width;
-          let height = img.height;
-          const maxSize = 1200;
-          if (width > maxSize || height > maxSize) {
-            if (width > height) { height = (maxSize / width) * height; width = maxSize; }
-            else { width = (maxSize / height) * width; height = maxSize; }
-          }
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-            } else {
-              reject(new Error('Compression failed'));
-            }
-          }, 'image/jpeg', 0.7);
-        };
-        img.onerror = () => reject(new Error('Image load failed'));
-        img.src = e.target.result;
-      };
-      reader.onerror = () => reject(new Error('File read failed'));
-      reader.readAsDataURL(file);
-    });
+  // Branche le stream sur la balise vidéo quand la modale s'ouvre
+  useEffect(() => {
+    if (showCamera && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [showCamera]);
+
+  // Libère les object URLs à la destruction du composant
+  useEffect(() => {
+    return () => {
+      closeCamera();
+      formData.photos.forEach(p => {
+        if (p.preview?.startsWith('blob:')) URL.revokeObjectURL(p.preview);
+      });
+    };
+  }, []); // eslint-disable-line
+
+  // --- CAMERA getUserMedia (évite de recevoir un fichier full-res en mémoire) ---
+  const openCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width:  { ideal: 1280, max: 1920 },
+          height: { ideal: 720,  max: 1080 }
+        },
+        audio: false
+      });
+      streamRef.current = stream;
+      setShowCamera(true);
+    } catch (err) {
+      setError("Caméra inaccessible. Utilisez \"Choisir fichier\" à la place.");
+    }
   };
 
-  const handlePhotoCapture = async (e) => {
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  };
+
+  const captureFromCamera = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const canvas = document.createElement('canvas');
+    canvas.width  = video.videoWidth  || 1280;
+    canvas.height = video.videoHeight || 720;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    closeCamera();
+    canvas.toBlob((blob) => {
+      canvas.width = 0;
+      canvas.height = 0;
+      if (!blob) { setError('Erreur capture photo'); return; }
+      const file    = new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      const preview = URL.createObjectURL(blob);
+      setFormData(prev => ({ ...prev, photos: [...prev.photos, { file, preview }] }));
+    }, 'image/jpeg', 0.85);
+  };
+
+  // --- FICHIER (galerie / fichier existant) ---
+  const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
@@ -83,30 +114,69 @@ function AddRemarkPage() {
     }
 
     try {
-      const newPhotos = await Promise.all(toProcess.map(async (file) => {
+      const newPhotos = [];
+      for (const file of toProcess) {
         const compressed = await compressImage(file);
-        const preview = await new Promise((res) => {
-          const reader = new FileReader();
-          reader.onloadend = () => res(reader.result);
-          reader.readAsDataURL(compressed);
-        });
-        return { file: compressed, preview };
-      }));
-
+        const preview = URL.createObjectURL(compressed);
+        newPhotos.push({ file: compressed, preview });
+      }
       setFormData(prev => ({ ...prev, photos: [...prev.photos, ...newPhotos] }));
       setError('');
     } catch (err) {
       setError('Erreur traitement photo');
     }
-    // Reset input so same file can be selected again
     e.target.value = '';
   };
 
+  const compressImage = async (file) => {
+    if (file.size < 400 * 1024) return file;
+    const maxSize = 1024;
+    try {
+      const bitmap = await createImageBitmap(file, { resizeWidth: maxSize, resizeQuality: 'medium' });
+      const canvas = document.createElement('canvas');
+      canvas.width  = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext('2d').drawImage(bitmap, 0, 0);
+      bitmap.close();
+      return await new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          canvas.width = 0; canvas.height = 0;
+          blob ? resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }))
+               : reject(new Error('Compression failed'));
+        }, 'image/jpeg', 0.8);
+      });
+    } catch (_) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) { height = Math.round((maxSize / width) * height); width = maxSize; }
+            else { width = Math.round((maxSize / height) * width); height = maxSize; }
+          }
+          canvas.width = width; canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            canvas.width = 0; canvas.height = 0;
+            blob ? resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }))
+                 : reject(new Error('Compression failed'));
+          }, 'image/jpeg', 0.8);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+        img.src = url;
+      });
+    }
+  };
+
   const removePhoto = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      photos: prev.photos.filter((_, i) => i !== index)
-    }));
+    setFormData(prev => {
+      const removed = prev.photos[index];
+      if (removed?.preview?.startsWith('blob:')) URL.revokeObjectURL(removed.preview);
+      return { ...prev, photos: prev.photos.filter((_, i) => i !== index) };
+    });
   };
 
   const handleGetLocation = () => {
@@ -121,7 +191,7 @@ function AddRemarkPage() {
         }));
         setGettingLocation(false);
       },
-      (err) => { setError('Impossible obtenir position'); setGettingLocation(false); },
+      () => { setError('Impossible obtenir position'); setGettingLocation(false); },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
@@ -155,6 +225,21 @@ function AddRemarkPage() {
 
   return (
     <div className="add-remark-page">
+
+      {/* Modale caméra getUserMedia */}
+      {showCamera && (
+        <div className="camera-overlay">
+          <video ref={videoRef} autoPlay playsInline muted className="camera-video" />
+          <div className="camera-controls">
+            <button type="button" className="camera-close-btn" onClick={closeCamera}>✕</button>
+            <button type="button" className="camera-shutter-btn" onClick={captureFromCamera}>
+              <span className="camera-shutter-inner" />
+            </button>
+            <div style={{ width: 48 }} />
+          </div>
+        </div>
+      )}
+
       <header className="page-header">
         <button type="button" onClick={() => navigate('/')} className="btn-back">← Retour</button>
         <h1>Nouvelle remarque</h1>
@@ -201,7 +286,6 @@ function AddRemarkPage() {
         <div className="form-card">
           <h2 className="section-title">📸 Photos <span className="photos-counter">{formData.photos.length}/{MAX_PHOTOS}</span></h2>
 
-          {/* Grille des photos sélectionnées */}
           {formData.photos.length > 0 && (
             <div className="photos-grid">
               {formData.photos.map((p, i) => (
@@ -213,20 +297,17 @@ function AddRemarkPage() {
             </div>
           )}
 
-          {/* Boutons ajout si < 3 photos */}
           {canAddMore && (
             <div className="photo-buttons">
-              <button type="button" className="btn-photo" onClick={() => cameraInputRef.current?.click()}>
+              <button type="button" className="btn-photo" onClick={openCamera}>
                 📷<br/>Appareil photo
               </button>
-              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment"
-                onChange={handlePhotoCapture} style={{ display: 'none' }} />
 
               <button type="button" className="btn-photo" onClick={() => fileInputRef.current?.click()}>
                 📁<br/>Choisir fichier
               </button>
               <input ref={fileInputRef} type="file" accept="image/*" multiple
-                onChange={handlePhotoCapture} style={{ display: 'none' }} />
+                onChange={handleFileSelect} style={{ display: 'none' }} />
             </div>
           )}
         </div>

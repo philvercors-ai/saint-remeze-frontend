@@ -216,6 +216,24 @@ async getRemarkById(id) {
     return this.getRemark(id);
   },
 
+  async editRemark(id, { title, description, category }) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return { success: false, message: 'Non authentifié' };
+      const response = await fetch(`${API_URL}/api/remarks/${id}/edit`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title, description, category })
+      });
+      return await response.json();
+    } catch (error) {
+      return { success: false, message: 'Erreur de connexion au serveur' };
+    }
+  },
+
   // ============================
   // MOT DE PASSE OUBLIÉ
   // ============================

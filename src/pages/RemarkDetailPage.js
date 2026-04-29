@@ -1,15 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import apiService from '../services/apiService';
 import './RemarkDetailPage.css';
+
+const CATEGORIES = [
+  'Aide à la personne',
+  'Circulation / Stationnement',
+  'Culture / Événements',
+  'Eau et Assainissement',
+  'École et périscolaire',
+  'Éclairage public',
+  'Espaces verts',
+  'Propreté',
+  'Travaux / Infrastructure',
+  'Voirie',
+  'Autre'
+];
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://saint-remeze-backend.onrender.com';
 
 function RemarkDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [remark, setRemark] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({ title: '', description: '', category: '' });
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     fetchRemarkDetail();
@@ -47,6 +68,41 @@ function RemarkDetailPage() {
       day: 'numeric', month: 'long', year: 'numeric'
     });
 
+  const canEdit = !!(
+    user && remark &&
+    remark.user?._id === user._id &&
+    ['En attente', 'Vue'].includes(remark.status)
+  );
+
+  const handleEditOpen = () => {
+    setEditForm({
+      title: remark.title,
+      description: remark.description || '',
+      category: remark.category
+    });
+    setEditError('');
+    setEditMode(true);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setEditError('');
+    const result = await apiService.editRemark(id, editForm);
+    if (result.success) {
+      setRemark(result.remark);
+      setEditMode(false);
+    } else {
+      setEditError(result.message || 'Erreur lors de la sauvegarde');
+    }
+    setSaving(false);
+  };
+
   if (loading) {
     return (
       <div className="rdp-page">
@@ -75,12 +131,65 @@ function RemarkDetailPage() {
 
   return (
     <div className="rdp-page">
+      {editMode && (
+        <div className="rdp-edit-overlay" onClick={() => !saving && setEditMode(false)}>
+          <div className="rdp-edit-modal" onClick={e => e.stopPropagation()}>
+            <div className="rdp-edit-modal-header">
+              <h2>Modifier la remarque</h2>
+              <button className="rdp-edit-close" onClick={() => setEditMode(false)} disabled={saving}>×</button>
+            </div>
+            {editError && <div className="rdp-edit-error">{editError}</div>}
+            <form onSubmit={handleEditSubmit} className="rdp-edit-form">
+              <div className="rdp-edit-field">
+                <label>Catégorie</label>
+                <select name="category" value={editForm.category} onChange={handleEditChange} required disabled={saving}>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="rdp-edit-field">
+                <label>Titre</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={editForm.title}
+                  onChange={handleEditChange}
+                  required
+                  maxLength={100}
+                  disabled={saving}
+                />
+              </div>
+              <div className="rdp-edit-field">
+                <label>Description</label>
+                <textarea
+                  name="description"
+                  value={editForm.description}
+                  onChange={handleEditChange}
+                  rows={5}
+                  disabled={saving}
+                />
+              </div>
+              <div className="rdp-edit-actions">
+                <button type="button" className="rdp-edit-cancel" onClick={() => setEditMode(false)} disabled={saving}>
+                  Annuler
+                </button>
+                <button type="submit" className="rdp-edit-save" disabled={saving}>
+                  {saving ? 'Enregistrement…' : 'Enregistrer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <header className="rdp-header">
         <button className="rdp-back-btn" onClick={() => navigate('/')}>
           ← Retour
         </button>
         <span className="rdp-header-label">Mairie de Saint-Remèze</span>
-        <div></div>
+        {canEdit
+          ? <button className="rdp-edit-btn" onClick={handleEditOpen}>Modifier</button>
+          : <div></div>
+        }
       </header>
 
       <main className="rdp-main">

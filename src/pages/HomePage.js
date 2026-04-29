@@ -84,7 +84,7 @@ function HomePage() {
           <div className="header-logo">
             <img src="/logo-saint-remeze.png" alt="Logo" onError={(e) => e.target.style.display='none'} />
             <h1>Saint-Remèze</h1>
-            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.3</button>
+            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.8</button>
           </div>
           
           <div className="header-actions">
@@ -160,7 +160,19 @@ function HomePage() {
 
             <div className="cl-version">
               <div className="cl-version-header">
-                <span className="cl-tag current">v7.2.3</span>
+                <span className="cl-tag current">v7.2.8</span>
+                <span className="cl-date">18 avril 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Caméra : remplacement de l'input fichier par getUserMedia — plus de crash mémoire</li>
+                <li>Admin : filtre temporel (Du / Au) sur les exports PDF et CSV</li>
+                <li>PDF : plage de dates et nombre de signalements affichés en page 1</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.3</span>
                 <span className="cl-date">13 mars 2026</span>
               </div>
               <ul className="cl-list">

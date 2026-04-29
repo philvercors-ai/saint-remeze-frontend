@@ -221,6 +221,149 @@
   border: 1px solid #e2e8f0;
 }
 
+/* ── Bouton Modifier (header) ── */
+.rdp-edit-btn {
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.35);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: unset;
+}
+.rdp-edit-btn:hover { background: rgba(255,255,255,.28); }
+
+/* ── Modal édition ── */
+.rdp-edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.rdp-edit-modal {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.rdp-edit-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.rdp-edit-modal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.rdp-edit-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-muted);
+  cursor: pointer;
+  padding: 0 0.25rem;
+  min-height: unset;
+}
+.rdp-edit-close:hover { color: var(--color-text); }
+
+.rdp-edit-error {
+  margin: 0.75rem 1.5rem 0;
+  padding: 0.65rem 0.9rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+}
+
+.rdp-edit-form { padding: 1.25rem 1.5rem 1.5rem; }
+
+.rdp-edit-field { margin-bottom: 1rem; }
+.rdp-edit-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-bottom: 0.35rem;
+}
+.rdp-edit-field input,
+.rdp-edit-field select,
+.rdp-edit-field textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background: #fff;
+  transition: border-color 0.15s;
+}
+.rdp-edit-field input:focus,
+.rdp-edit-field select:focus,
+.rdp-edit-field textarea:focus {
+  outline: none;
+  border-color: var(--color-navy);
+}
+.rdp-edit-field textarea { resize: vertical; }
+
+.rdp-edit-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.rdp-edit-cancel {
+  padding: 0.6rem 1.2rem;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: unset;
+}
+.rdp-edit-cancel:hover:not(:disabled) { background: #f1f5f9; }
+
+.rdp-edit-save {
+  padding: 0.6rem 1.4rem;
+  background: var(--color-navy);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: unset;
+}
+.rdp-edit-save:hover:not(:disabled) { background: #0f2a44; }
+.rdp-edit-save:disabled,
+.rdp-edit-cancel:disabled { opacity: 0.6; cursor: not-allowed; }
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .rdp-doc-body { padding: 1.25rem; }
