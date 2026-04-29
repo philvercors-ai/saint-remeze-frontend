@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saint-remeze-v1';
+const CACHE_NAME = 'saint-remeze-v7.2.9';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
