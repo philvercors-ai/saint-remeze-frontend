@@ -75,15 +75,6 @@ function RemarkDetailPage() {
     remarkUserId.toString() === currentUserId.toString() &&
     ['En attente', 'Vue'].includes(remark?.status)
   );
-  console.log('[DEBUG canEdit]', {
-    remarkUser: remark?.user,
-    remarkUserId,
-    currentUserId,
-    status: remark?.status,
-    idsMatch: remarkUserId?.toString() === currentUserId?.toString(),
-    statusOk: ['En attente', 'Vue'].includes(remark?.status),
-    canEdit
-  });
 
   const handleEditOpen = () => {
     setEditForm({
@@ -197,10 +188,7 @@ function RemarkDetailPage() {
           ← Retour
         </button>
         <span className="rdp-header-label">Mairie de Saint-Remèze</span>
-        {canEdit
-          ? <button className="rdp-edit-btn" onClick={handleEditOpen}>Modifier</button>
-          : <div></div>
-        }
+        <div></div>
       </header>
 
       <main className="rdp-main">
@@ -222,6 +210,11 @@ function RemarkDetailPage() {
               <span className="rdp-status-value" style={getStatusStyle(remark.status)}>
                 {remark.status?.toUpperCase()}
               </span>
+              {canEdit && (
+                <button className="rdp-edit-inline-btn" onClick={handleEditOpen}>
+                  ✏️ Modifier
+                </button>
+              )}
             </div>
 
             {/* Déclarant / Catégorie */}

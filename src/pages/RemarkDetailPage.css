@@ -98,6 +98,25 @@
 .rdp-status-label { font-weight: 700; color: var(--color-navy); }
 .rdp-status-value { font-weight: 700; font-size: 0.9rem; }
 
+.rdp-edit-inline-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.9rem;
+  background: var(--color-navy);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: unset;
+}
+.rdp-edit-inline-btn:hover { background: #0f2a44; }
+
 /* ── Info grid ── */
 .rdp-info-grid {
   display: grid;
