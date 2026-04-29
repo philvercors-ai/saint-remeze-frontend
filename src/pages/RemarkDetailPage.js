@@ -68,10 +68,12 @@ function RemarkDetailPage() {
       day: 'numeric', month: 'long', year: 'numeric'
     });
 
+  const remarkUserId = remark?.user?._id ?? remark?.user?.id ?? remark?.userId;
+  const currentUserId = user?._id ?? user?.id;
   const canEdit = !!(
-    user && remark &&
-    remark.user?._id === user._id &&
-    ['En attente', 'Vue'].includes(remark.status)
+    remarkUserId && currentUserId &&
+    remarkUserId.toString() === currentUserId.toString() &&
+    ['En attente', 'Vue'].includes(remark?.status)
   );
 
   const handleEditOpen = () => {
