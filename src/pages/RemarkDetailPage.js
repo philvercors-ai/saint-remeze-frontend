@@ -75,6 +75,15 @@ function RemarkDetailPage() {
     remarkUserId.toString() === currentUserId.toString() &&
     ['En attente', 'Vue'].includes(remark?.status)
   );
+  console.log('[DEBUG canEdit]', {
+    remarkUser: remark?.user,
+    remarkUserId,
+    currentUserId,
+    status: remark?.status,
+    idsMatch: remarkUserId?.toString() === currentUserId?.toString(),
+    statusOk: ['En attente', 'Vue'].includes(remark?.status),
+    canEdit
+  });
 
   const handleEditOpen = () => {
     setEditForm({
