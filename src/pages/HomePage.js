@@ -84,7 +84,7 @@ function HomePage() {
           <div className="header-logo">
             <img src="/logo-saint-remeze.png" alt="Logo" onError={(e) => e.target.style.display='none'} />
             <h1>Saint-Remèze</h1>
-            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.10</button>
+            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.11</button>
           </div>
           
           <div className="header-actions">
@@ -160,7 +160,17 @@ function HomePage() {
 
             <div className="cl-version">
               <div className="cl-version-header">
-                <span className="cl-tag current">v7.2.10</span>
+                <span className="cl-tag current">v7.2.11</span>
+                <span className="cl-date">4 mai 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Export PDF : photo redimensionnée pour tenir sur la même page que le signalement</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.10</span>
                 <span className="cl-date">29 avril 2026</span>
               </div>
               <ul className="cl-list">

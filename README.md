@@ -1,4 +1,4 @@
-# Saint-Remèze Frontend v7.2.10
+# Saint-Remèze Frontend v7.2.11
 
 ## Installation
 ```bash
@@ -9,6 +9,9 @@ npm start
 http://localhost:3000
 
 ## Historique des versions
+
+### v7.2.11
+- Export PDF : photo redimensionnée pour tenir sur la même page que le signalement (côté admin)
 
 ### v7.2.10
 - Bouton "✏️ Modifier" affiché directement sur la ligne du statut dans le document
