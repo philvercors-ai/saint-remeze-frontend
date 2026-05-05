@@ -10,6 +10,10 @@ http://localhost:3000
 
 ## Historique des versions
 
+### v7.2.12
+- Manuel d'utilisation accessible depuis le bandeau supérieur (icône 📖)
+- Notification email automatique à chaque changement de statut (côté backend)
+
 ### v7.2.11
 - Export PDF : photo redimensionnée pour tenir sur la même page que le signalement (côté admin)
 

@@ -84,15 +84,25 @@ function HomePage() {
           <div className="header-logo">
             <img src="/logo-saint-remeze.png" alt="Logo" onError={(e) => e.target.style.display='none'} />
             <h1>Saint-Remèze</h1>
-            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.11</button>
+            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.12</button>
           </div>
           
           <div className="header-actions">
+            <a
+              className="btn btn-icon"
+              href="https://saint-remeze-backend.onrender.com/manuel.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Manuel d'utilisation"
+            >
+              📖
+            </a>
+
             <button className="btn btn-icon" onClick={() => navigate('/notifications')} title="Notifications">
               🔔
               {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
             </button>
-            
+
             <button className="btn btn-icon" onClick={() => logout()} title="Déconnexion">
               🚪
             </button>
@@ -160,7 +170,18 @@ function HomePage() {
 
             <div className="cl-version">
               <div className="cl-version-header">
-                <span className="cl-tag current">v7.2.11</span>
+                <span className="cl-tag current">v7.2.12</span>
+                <span className="cl-date">5 mai 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Manuel d'utilisation accessible depuis le bandeau supérieur (icône 📖)</li>
+                <li>Notification email automatique à chaque changement de statut</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.11</span>
                 <span className="cl-date">4 mai 2026</span>
               </div>
               <ul className="cl-list">
