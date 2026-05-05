@@ -1,3 +1,17 @@
-.vercel
+# Dépendances
 node_modules/
+
+# Variables d'environnement — NE JAMAIS COMMITER
 .env
+.env.*
+!.env.production
+
+# Vercel
+.vercel
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
