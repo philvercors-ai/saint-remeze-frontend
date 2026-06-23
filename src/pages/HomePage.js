@@ -84,7 +84,7 @@ function HomePage() {
           <div className="header-logo">
             <img src="/logo-saint-remeze.png" alt="Logo" onError={(e) => e.target.style.display='none'} />
             <h1>Saint-Remèze</h1>
-            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.12</button>
+            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.14</button>
           </div>
           
           <div className="header-actions">
@@ -170,7 +170,32 @@ function HomePage() {
 
             <div className="cl-version">
               <div className="cl-version-header">
-                <span className="cl-tag current">v7.2.12</span>
+                <span className="cl-tag current">v7.2.14</span>
+                <span className="cl-date">23 juin 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Correction : chaque citoyen ne voit que ses propres signalements</li>
+                <li>Correction : l'application s'ouvre sur la page de connexion (et non d'inscription)</li>
+                <li>Vercel Analytics activé</li>
+                <li>Sécurité : fichiers .env exclus du dépôt Git</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.13</span>
+                <span className="cl-date">23 juin 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Champ "Note Admin" renommé "Commentaire" — inclus dans l'email de notification au citoyen</li>
+                <li>Manuel admin disponible depuis le bandeau supérieur du dashboard</li>
+                <li>Sécurité : Helmet, CORS, rate limiting, routes admin protégées par rôle</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.12</span>
                 <span className="cl-date">5 mai 2026</span>
               </div>
               <ul className="cl-list">
