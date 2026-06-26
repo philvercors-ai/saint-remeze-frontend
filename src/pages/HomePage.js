@@ -84,7 +84,7 @@ function HomePage() {
           <div className="header-logo">
             <img src="/logo-saint-remeze.png" alt="Logo" onError={(e) => e.target.style.display='none'} />
             <h1>Saint-Remèze</h1>
-            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.14</button>
+            <button className="version-badge" onClick={() => setShowChangelog(true)}>v7.2.15</button>
           </div>
           
           <div className="header-actions">
@@ -170,7 +170,18 @@ function HomePage() {
 
             <div className="cl-version">
               <div className="cl-version-header">
-                <span className="cl-tag current">v7.2.14</span>
+                <span className="cl-tag current">v7.2.15</span>
+                <span className="cl-date">26 juin 2026</span>
+              </div>
+              <ul className="cl-list">
+                <li>Anti cold-start : ping périodique <code>/api/health</code> via UptimeRobot — plus de délai au réveil du serveur</li>
+                <li>Manuels mis à jour (citoyen et administrateur)</li>
+              </ul>
+            </div>
+
+            <div className="cl-version">
+              <div className="cl-version-header">
+                <span className="cl-tag">v7.2.14</span>
                 <span className="cl-date">23 juin 2026</span>
               </div>
               <ul className="cl-list">
